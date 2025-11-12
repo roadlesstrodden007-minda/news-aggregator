@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cybersecurity News Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+            color: #e0e0e0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+        }
+
+        .header h1 {
+            color: #00d9ff;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 0 0 10px rgba(0, 217, 255, 0.5);
+        }
+
+        .header h1 a {
+            color: #00d9ff;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .header h1 a:hover {
+            color: #00f0ff;
+            text-shadow: 0 0 20px rgba(0, 217, 255, 0.8);
+        }
+
+        .header p {
+            color: #b0b0b0;
+            font-size: 1.1em;
+        }
+
+        .controls {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .controls button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-size: 1em;
+            cursor: pointer;
+            margin: 0 10px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .controls button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+        }
+
+        .controls button:active {
+            transform: translateY(0);
+        }
+
+        .search-container {
+            max-width: 600px;
+            margin: 0 auto 30px;
+            position: relative;
+        }
+
+        .search-box {
+            width: 100%;
+            padding: 15px 50px 15px 20px;
+            font-size: 1.1em;
+            border: 2px solid rgba(0, 217, 255, 0.3);
+            border-radius: 30px;
+            background: rgba(255, 255, 255, 0.05);
+            color: #e0e0e0;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .search-box:focus {
+            outline: none;
+            border-color: #00d9ff;
+            box-shadow: 0 0 20px rgba(0, 217, 255, 0.3);
+        }
+
+        .search-box::placeholder {
+            color: #888;
+        }
+
+        .search-icon {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #00d9ff;
+            font-size: 1.2em;
+            pointer-events: none;
+        }
+
+        .search-stats {
+            text-align: center;
+            color: #00d9ff;
+            margin-bottom: 15px;
+            font-size: 0.95em;
+        }
+
+        .news-item.hidden {
+            display: none;
+        }
+
+        .news-source.no-results {
+            opacity: 0.3;
+        }
+
+        .highlight {
+            background-color: rgba(255, 255, 0, 0.3);
+            color: #fff;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            font-size: 1.2em;
+            color: #00d9ff;
+        }
+
+        .news-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        .news-source {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .news-source:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 217, 255, 0.2);
+            border-color: rgba(0, 217, 255, 0.3);
+        }
+
+        .source-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid rgba(0, 217, 255, 0.3);
+        }
+
+        .source-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+            font-weight: bold;
+            color: white;
+        }
+
+        .source-name {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #00d9ff;
+        }
+
+        .news-item {
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .news-item:last-child {
+            border-bottom: none;
+        }
+
+        .news-item a {
+            color: #e0e0e0;
+            text-decoration: none;
+            display: block;
+            transition: color 0.3s ease;
+            line-height: 1.5;
+        }
+
+        .news-item a:hover {
+            color: #00d9ff;
+        }
+
+        .news-date {
+            font-size: 0.85em;
+            color: #888;
+            margin-top: 5px;
+        }
+
+        .error {
+            background: rgba(255, 82, 82, 0.1);
+            border: 1px solid rgba(255, 82, 82, 0.3);
+            color: #ff5252;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .last-updated {
+            text-align: center;
+            color: #888;
+            margin-top: 30px;
+            font-size: 0.9em;
+        }
+
+        @media (max-width: 768px) {
+            .news-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .header h1 {
+                font-size: 1.8em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🛡️ <a href="https://roadlesscyber.co.site" target="_blank" rel="noopener noreferrer" style="color: #00d9ff; text-decoration: none;">Roadlesstrodden</a></h1>
+        <p>Cybersecurity News Dashboard - Real-time updates from top security sources</p>
+    </div>
+
+    <div class="controls">
+        <button onclick="refreshFeeds()">🔄 Refresh All Feeds</button>
+        <button onclick="clearCache()">🗑️ Clear Cache</button>
+    </div>
+
+    <div class="search-container">
+        <input 
+            type="text" 
+            id="searchBox" 
+            class="search-box" 
+            placeholder="Search for ransomware, vulnerabilities, breaches, malware..."
+            onkeyup="searchNews()"
+        >
+        <span class="search-icon">🔍</span>
+    </div>
+
+    <div id="searchStats" class="search-stats"></div>
+
+    <div id="loading" class="loading">Loading cybersecurity news...</div>
+    <div id="newsContainer" class="news-grid"></div>
+    <div id="lastUpdated" class="last-updated"></div>
+
+    <script>
+        const RSS_FEEDS = [
+            {
+                name: 'Bleeping Computer',
+                url: 'https://www.bleepingcomputer.com/feed/',
+                icon: 'BC'
+            },
+            {
+                name: 'The Hacker News',
+                url: 'https://feeds.feedburner.com/TheHackersNews',
+                icon: 'THN'
+            },
+            {
+                name: 'Krebs on Security',
+                url: 'https://krebsonsecurity.com/feed/',
+                icon: 'KS'
+            },
+            {
+                name: 'Dark Reading',
+                url: 'https://www.darkreading.com/rss.xml',
+                icon: 'DR'
+            },
+            {
+                name: 'CSO Online',
+                url: 'https://www.csoonline.com/feed/',
+                icon: 'CSO'
+            },
+            {
+                name: 'CyberScoop',
+                url: 'https://cyberscoop.com/feed/',
+                icon: 'CS'
+            },
+            {
+                name: 'Infosecurity Magazine',
+                url: 'https://www.infosecurity-magazine.com/rss/news/',
+                icon: 'IM'
+            },
+            {
+                name: 'Security Week',
+                url: 'https://www.securityweek.com/feed/',
+                icon: 'SW'
+            },
+            {
+                name: 'Threatpost',
+                url: 'https://threatpost.com/feed/',
+                icon: 'TP'
+            },
+            {
+                name: 'Ransomware.live',
+                url: 'https://www.ransomware.live/rss.xml',
+                icon: 'RL'
+            }
+        ];
+
+        const CACHE_DURATION = 15 * 60 * 1000; // 15 minutes
+
+        function parseRSSFeed(xmlString) {
+            const parser = new DOMParser();
+            const xmlDoc = parser.parseFromString(xmlString, 'text/xml');
+            
+            const items = [];
+            const itemNodes = xmlDoc.querySelectorAll('item');
+            
+            itemNodes.forEach((item, index) => {
+                if (index < 10) { // Limit to 10 items
+                    const title = item.querySelector('title')?.textContent || 'No title';
+                    const link = item.querySelector('link')?.textContent || '#';
+                    const pubDate = item.querySelector('pubDate')?.textContent || 
+                                   item.querySelector('published')?.textContent || 
+                                   new Date().toISOString();
+                    
+                    items.push({ title, link, pubDate });
+                }
+            });
+            
+            return { status: 'ok', items };
+        }
+
+        async function fetchFeed(feed) {
+            const cacheKey = `feed_${feed.name}`;
+            const cacheTimeKey = `feed_time_${feed.name}`;
+            
+            // Check cache
+            const cachedData = localStorage.getItem(cacheKey);
+            const cachedTime = localStorage.getItem(cacheTimeKey);
+            
+            if (cachedData && cachedTime) {
+                const age = Date.now() - parseInt(cachedTime);
+                if (age < CACHE_DURATION) {
+                    return JSON.parse(cachedData);
+                }
+            }
+
+            // Try multiple CORS proxy services
+            const proxies = [
+                `https://api.allorigins.win/raw?url=${encodeURIComponent(feed.url)}`,
+                `https://corsproxy.io/?${encodeURIComponent(feed.url)}`,
+                `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(feed.url)}`
+            ];
+
+            for (const proxyUrl of proxies) {
+                try {
+                    const response = await fetch(proxyUrl, {
+                        method: 'GET',
+                        headers: {
+                            'Accept': 'application/rss+xml, application/xml, text/xml'
+                        }
+                    });
+                    
+                    if (response.ok) {
+                        const xmlText = await response.text();
+                        const data = parseRSSFeed(xmlText);
+                        
+                        if (data.items && data.items.length > 0) {
+                            // Cache the data
+                            localStorage.setItem(cacheKey, JSON.stringify(data));
+                            localStorage.setItem(cacheTimeKey, Date.now().toString());
+                            return data;
+                        }
+                    }
+                } catch (error) {
+                    console.error(`Error with proxy for ${feed.name}:`, error);
+                    continue; // Try next proxy
+                }
+            }
+            
+            // Return cached data if available, even if expired
+            if (cachedData) {
+                console.log(`Using expired cache for ${feed.name}`);
+                return JSON.parse(cachedData);
+            }
+            
+            return null;
+        }
+
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            const now = new Date();
+            const diffMs = now - date;
+            const diffMins = Math.floor(diffMs / 60000);
+            const diffHours = Math.floor(diffMs / 3600000);
+            const diffDays = Math.floor(diffMs / 86400000);
+
+            if (diffMins < 60) {
+                return `${diffMins} minute${diffMins !== 1 ? 's' : ''} ago`;
+            } else if (diffHours < 24) {
+                return `${diffHours} hour${diffHours !== 1 ? 's' : ''} ago`;
+            } else if (diffDays < 7) {
+                return `${diffDays} day${diffDays !== 1 ? 's' : ''} ago`;
+            } else {
+                return date.toLocaleDateString();
+            }
+        }
+
+        function createSourceCard(feed, data) {
+            if (!data || !data.items || data.items.length === 0) {
+                return `
+                    <div class="news-source" data-source="${feed.name}">
+                        <div class="source-header">
+                            <div class="source-icon">${feed.icon}</div>
+                            <div class="source-name">${feed.name}</div>
+                        </div>
+                        <div class="error">Unable to load feed</div>
+                    </div>
+                `;
+            }
+
+            const items = data.items.slice(0, 5).map((item, index) => `
+                <div class="news-item" data-title="${item.title.toLowerCase()}" data-index="${index}">
+                    <a href="${item.link}" target="_blank" rel="noopener noreferrer">
+                        <span class="item-title">${item.title}</span>
+                    </a>
+                    <div class="news-date">${formatDate(item.pubDate)}</div>
+                </div>
+            `).join('');
+
+            return `
+                <div class="news-source" data-source="${feed.name}">
+                    <div class="source-header">
+                        <div class="source-icon">${feed.icon}</div>
+                        <div class="source-name">${feed.name}</div>
+                    </div>
+                    ${items}
+                </div>
+            `;
+        }
+
+        function searchNews() {
+            const searchTerm = document.getElementById('searchBox').value.toLowerCase().trim();
+            const newsItems = document.querySelectorAll('.news-item');
+            const newsSources = document.querySelectorAll('.news-source');
+            
+            if (searchTerm === '') {
+                // Show all items
+                newsItems.forEach(item => {
+                    item.classList.remove('hidden');
+                    // Remove highlights
+                    const titleSpan = item.querySelector('.item-title');
+                    if (titleSpan) {
+                        titleSpan.innerHTML = titleSpan.textContent;
+                    }
+                });
+                newsSources.forEach(source => source.classList.remove('no-results'));
+                document.getElementById('searchStats').textContent = '';
+                return;
+            }
+
+            let totalResults = 0;
+            const searchTerms = searchTerm.split(' ').filter(term => term.length > 0);
+
+            newsSources.forEach(source => {
+                const items = source.querySelectorAll('.news-item');
+                let visibleCount = 0;
+
+                items.forEach(item => {
+                    const title = item.getAttribute('data-title');
+                    const titleSpan = item.querySelector('.item-title');
+                    
+                    // Check if any search term matches
+                    const matches = searchTerms.some(term => title.includes(term));
+                    
+                    if (matches) {
+                        item.classList.remove('hidden');
+                        visibleCount++;
+                        totalResults++;
+                        
+                        // Highlight matching terms
+                        if (titleSpan) {
+                            let highlightedText = titleSpan.textContent;
+                            searchTerms.forEach(term => {
+                                const regex = new RegExp(`(${term})`, 'gi');
+                                highlightedText = highlightedText.replace(regex, '<span class="highlight">$1</span>');
+                            });
+                            titleSpan.innerHTML = highlightedText;
+                        }
+                    } else {
+                        item.classList.add('hidden');
+                        // Remove highlights
+                        if (titleSpan) {
+                            titleSpan.innerHTML = titleSpan.textContent;
+                        }
+                    }
+                });
+
+                // Hide/show source based on visible items
+                if (visibleCount === 0) {
+                    source.classList.add('no-results');
+                } else {
+                    source.classList.remove('no-results');
+                }
+            });
+
+            // Update search stats
+            const statsElement = document.getElementById('searchStats');
+            if (totalResults === 0) {
+                statsElement.textContent = `No results found for "${searchTerm}"`;
+            } else {
+                statsElement.textContent = `Found ${totalResults} article${totalResults !== 1 ? 's' : ''} matching "${searchTerm}"`;
+            }
+        }
+
+        async function loadAllFeeds() {
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('newsContainer').innerHTML = '';
+
+            const promises = RSS_FEEDS.map(feed => fetchFeed(feed));
+            const results = await Promise.all(promises);
+
+            document.getElementById('loading').style.display = 'none';
+
+            const container = document.getElementById('newsContainer');
+            results.forEach((data, index) => {
+                const card = createSourceCard(RSS_FEEDS[index], data);
+                container.innerHTML += card;
+            });
+
+            const now = new Date();
+            document.getElementById('lastUpdated').textContent = 
+                `Last updated: ${now.toLocaleString()}`;
+        }
+
+        function refreshFeeds() {
+            // Clear all feed caches
+            RSS_FEEDS.forEach(feed => {
+                localStorage.removeItem(`feed_${feed.name}`);
+                localStorage.removeItem(`feed_time_${feed.name}`);
+            });
+            // Clear search
+            document.getElementById('searchBox').value = '';
+            document.getElementById('searchStats').textContent = '';
+            loadAllFeeds();
+        }
+
+        function clearCache() {
+            localStorage.clear();
+            document.getElementById('searchBox').value = '';
+            document.getElementById('searchStats').textContent = '';
+            alert('Cache cleared! Reloading feeds...');
+            loadAllFeeds();
+        }
+
+        // Load feeds on page load
+        loadAllFeeds();
+
+        // Auto-refresh every 15 minutes
+        setInterval(loadAllFeeds, 15 * 60 * 1000);
+    </script>
+</body>
+</html>
