@@ -1,6 +1,8 @@
 # 🛡️ Cybersecurity News Aggregator
 
 A sleek, real-time cybersecurity news dashboard that aggregates RSS feeds from 10+ top security news sources into one beautiful interface. Perfect for security professionals, students, and enthusiasts who want to stay updated on the latest threats, vulnerabilities, and industry news.
+
+## View github page: (https://roadlesstrodden007-minda.github.io/news-aggregator)
 ## ✨ Features
 
 - 📰 **Multi-Source Aggregation** - Pulls news from 10+ leading cybersecurity websites
