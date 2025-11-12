@@ -56,5 +56,13 @@ A sleek, real-time cybersecurity news dashboard that aggregates RSS feeds from 1
 **Project Creator:** Roadlesstrodden
 **Website:** (https://roadlesscyber.co.site)
 
+⭐ Show Your Support
+If you find this project useful, please consider:
+
+⭐ Starring the repository
+🐛 Reporting bugs or issues
+💡 Suggesting new features
+📢 Sharing with others in the cybersecurity community
+
 Made with ❤️ for the cybersecurity community.
 Stay informed. Stay secure. 🛡️
